@@ -15,43 +15,50 @@ class Test extends TestCase
         ]);
     }
 
-    public function testPhones()
+    public function testCompanies1()
     {
         $expected = [
-            '245.432.2028 x524',
-            '1-259-640-9813 x969',
-            '417-776-8892',
-            '+1 (238) 263-4527',
-            '1-571-454-4353 x322',
-            '550-891-4483 x41047',
-            '573-869-8135 x2893',
-            '(409) 298-6892 x356',
-            '+1 (930) 595-3970',
-            '1-446-424-4025 x89768'
+            [ 'name' => 'Adams-Reichel','phone' => '1-986-987-9109 x56053' ],
+            [ 'name' => 'Dibbert-Morissette','phone' => '439.584.3132 x735' ],
+            [ 'name' => 'Ledner and Sons','phone' => '979-539-4173 x048' ],
+            [ 'name' => 'Kiehn-Mann','phone' => '972-379-1995 x61054' ],
+            [ 'name' => 'Bosco, Pouros and Larson','phone' => '887-919-2730 x49977' ]
         ];
-        $response = $this->client->get('/phones');
+        $response = $this->client->get('/companies');
         $body = $response->getBody()->getContents();
-        $actual = json_decode($body);
-        $this->assertEquals($expected, $actual);
+        $companies = json_decode($body);
+        $filteredCompanies = collect($companies)->map(function ($company) {
+            return ['name' => $company->name, 'phone' => $company->phone];
+        })->all();
+        $this->assertEquals($expected, $filteredCompanies);
     }
 
-    public function testDomains()
+    public function testCompanies2()
     {
         $expected = [
-            'schroeder.com',
-            'mueller.com',
-            'luettgen.biz',
-            'emard.info',
-            'satterfield.com',
-            'reynolds.com',
-            'reichel.info',
-            'douglas.net',
-            'williamson.net',
-            'carter.com'
+            [ 'name' => 'Ledner and Sons','phone' => '979-539-4173 x048' ],
         ];
-        $response = $this->client->get('/domains');
+        $response = $this->client->get('/companies?page=3&per=1');
         $body = $response->getBody()->getContents();
-        $actual = json_decode($body);
-        $this->assertEquals($expected, $actual);
+        $companies = json_decode($body);
+        $filteredCompanies = collect($companies)->map(function ($company) {
+            return ['name' => $company->name, 'phone' => $company->phone];
+        })->all();
+        $this->assertEquals($expected, $filteredCompanies);
+    }
+
+    public function testCompanies3()
+    {
+        $expected = [
+            [ 'name' => 'Zemlak-Wuckert', 'phone' => '291-495-8263 x678' ],
+            [ 'name' => 'Osinski, Kutch and Christiansen', 'phone' => '(843) 796-4156 x65355' ],
+        ];
+        $response = $this->client->get('/companies?page=20&per=2');
+        $body = $response->getBody()->getContents();
+        $companies = json_decode($body);
+        $filteredCompanies = collect($companies)->map(function ($company) {
+            return ['name' => $company->name, 'phone' => $company->phone];
+        })->all();
+        $this->assertEquals($expected, $filteredCompanies);
     }
 }
