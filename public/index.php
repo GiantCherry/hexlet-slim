@@ -9,29 +9,21 @@ $companies = App\Generator::generate(100);
 $app = AppFactory::create();
 $app->addErrorMiddleware(true, true, true);
 
-$app->get('/', function ($request, $response) {
-    return $response->write('go to the /companies');
+$app->get('/', function ($request, $response, $args) {
+    return $response->write('open something like (you can change id): /companies/5');
 });
 
 // BEGIN (write your solution here)
-$app->get('/companies', function ($request, $response) use ($companies) {
-    $page = $request->getQueryParam('page', 0);
-    $per = $request->getQueryParam('per', 5);
+$app->get('/companies/{id}', function ($request, $response, $args) use ($companies) {
+    $id = $args['id'];
+    $company = collect($companies)->firstWhere('id', $id);
 
-    if ($page > 0) {
-        $page--;
+    if (empty($company)) {
+        return $response->withStatus(404)->write('Page not found.');
     }
 
-    $getCompanies = function ($page = 0, $per = 5) use ($companies) {
-        $notIdCompanies = array_map(function ($company) {
-            return ['name' => $company['name'], 'phone' => $company['phone']];
-        }, $companies);
-
-        return array_slice($notIdCompanies, $page, $per);
-    };
-
-    return $response->write(json_encode($getCompanies($page * $per,  $per)));
+    return $response->write(json_encode($company));
 });
-// END
 
 $app->run();
+// END
