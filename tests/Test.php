@@ -15,33 +15,38 @@ class Test extends TestCase
         ]);
     }
 
-    public function testCompanies1()
+    public function testUser()
     {
-        $response = $this->client->get('/companies/1');
+        $response = $this->client->get('/users/1');
         $body = $response->getBody()->getContents();
-
-        $data = json_decode($body);
-        $this->assertObjectHasAttribute('name', $data);
-        $this->assertObjectHasAttribute('id', $data);
-        $this->assertEquals(1, $data->id);
+        $this->assertNotEmpty($body);
     }
 
-    public function testCompanies2()
+    public function testUser2()
     {
-        $response = $this->client->get('/companies/98');
+        $response = $this->client->get('/users/99');
         $body = $response->getBody()->getContents();
 
-        $data = json_decode($body);
-        $this->assertObjectHasAttribute('phone', $data);
-        $this->assertObjectHasAttribute('id', $data);
-        $this->assertEquals(98, $data->id);
+        $this->assertContains('Grant', $body);
+        $this->assertContains('Cara', $body);
+        $this->assertContains('borer.nigel@gmail.com', $body);
     }
 
-    /**
-     * @expectedException GuzzleHttp\Exception\ClientException
-     */
-    public function testCompanies3()
+    public function testUser3()
     {
-        $this->client->get('/companies/12341234');
+        $response = $this->client->get('/users/100');
+        $body = $response->getBody()->getContents();
+
+        $this->assertContains('Haley', $body);
+        $this->assertContains('Stokes', $body);
+    }
+
+    public function testUsers()
+    {
+        $response = $this->client->get('/users');
+        $body = $response->getBody()->getContents();
+
+        $this->assertContains('Julianne', $body);
+        $this->assertContains('Norval', $body);
     }
 }
