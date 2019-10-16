@@ -3,18 +3,11 @@
 <!-- BEGIN (write your solution here) -->
 <table>
     <tr>
+        <?php foreach ($user as $key => $value) : ?>
         <td>
-            <?= $id ?>
+            <?= htmlspecialchars($value) ?>
         </td>
-        <td>
-            <?= $firstName ?>
-        </td>
-        <td>
-            <?= $lastName ?>
-        </td>
-        <td>
-            <?= $email ?>
-        </td>
+        <?php endforeach; ?>
     </tr>
 </table>
 <!-- END -->

@@ -3,10 +3,10 @@
     <?php foreach ($users as $user): ?>
         <tr>
             <td>
-                <?= $user['id'] ?>
+                <?= htmlspecialchars($user['id']) ?>
             </td>
             <td>
-                <a href="/users/<?= $user['id'] ?>"><?= $user['firstName'] ?></a>
+                <a href="/users/<?= htmlspecialchars($user['id']) ?>"><?= htmlspecialchars($user['firstName']) ?></a>
             </td>
         </tr>
     <?php endforeach ?>
