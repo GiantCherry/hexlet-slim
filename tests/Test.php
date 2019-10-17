@@ -15,30 +15,11 @@ class Test extends TestCase
         ]);
     }
 
-    public function testUser()
+    public function testForm()
     {
-        $response = $this->client->get('/users/1');
+        $response = $this->client->get('/users');
         $body = $response->getBody()->getContents();
-        $this->assertNotEmpty($body);
-    }
-
-    public function testUser2()
-    {
-        $response = $this->client->get('/users/99');
-        $body = $response->getBody()->getContents();
-
-        $this->assertContains('Grant', $body);
-        $this->assertContains('Cara', $body);
-        $this->assertContains('borer.nigel@gmail.com', $body);
-    }
-
-    public function testUser3()
-    {
-        $response = $this->client->get('/users/100');
-        $body = $response->getBody()->getContents();
-
-        $this->assertContains('Haley', $body);
-        $this->assertContains('Stokes', $body);
+        $this->assertContains('form', $body);
     }
 
     public function testUsers()
@@ -46,7 +27,27 @@ class Test extends TestCase
         $response = $this->client->get('/users');
         $body = $response->getBody()->getContents();
 
-        $this->assertContains('Julianne', $body);
-        $this->assertContains('Norval', $body);
+        $this->assertContains('Wanda', $body);
+        $this->assertContains('Abagail', $body);
+    }
+
+    public function testUsersWithTerm()
+    {
+        $response = $this->client->get('/users?term=alex');
+        $body = $response->getBody()->getContents();
+
+        $this->assertContains('Alexandra', $body);
+        $this->assertContains('Alexie', $body);
+        $this->assertNotContains('Albertha', $body);
+        $this->assertNotContains('Betsy', $body);
+        $this->assertNotContains('Tiana', $body);
+    }
+
+    public function testNotFoundTerm()
+    {
+        $response = $this->client->get('/users?term=bbbbbb');
+        $body = $response->getBody()->getContents();
+
+        $this->assertContains('bbbbbb', $body);
     }
 }

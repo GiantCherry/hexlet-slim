@@ -6,13 +6,13 @@ class Generator
 {
     public static function generate($count)
     {
-        $range = range(1, $count - 2);
-        $numbers = collect($range)->shuffle(1)->toArray();
+        $numbers = range(1, $count);
+        shuffle($numbers);
 
         $faker = \Faker\Factory::create();
-        $faker->seed(1234);
+        $faker->seed(1);
         $users = [];
-        for ($i = 0; $i < $count - 2; $i++) {
+        for ($i = 0; $i < $count; $i++) {
             $users[] = [
                 'id' => $numbers[$i],
                 'firstName' => $faker->firstName,
@@ -20,20 +20,6 @@ class Generator
                 'email' => $faker->email
             ];
         }
-
-        $users[] = [
-            'id' => 99,
-            'firstName' => $faker->firstName,
-            'lastName' => $faker->lastName,
-            'email' => $faker->email
-        ];
-
-        $users[] = [
-            'id' => 100,
-            'firstName' => $faker->firstName,
-            'lastName' => $faker->lastName,
-            'email' => $faker->email
-        ];
 
         return $users;
     }

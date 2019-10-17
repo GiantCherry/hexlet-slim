@@ -1,14 +1,12 @@
 <?php
 
+use function Stringy\create as s;
 use Slim\Factory\AppFactory;
 use DI\Container;
 
 require __DIR__ . '/../vendor/autoload.php';
 
-// Список пользователей
-// Каждый пользователь – ассоциативный массив следующей структуры: id, firstName, lastName, email
 $users = App\Generator::generate(100);
-$myUsers = ['mike', 'mishel', 'adel', 'keks', 'kamila'];
 
 $container = new Container();
 $container->set('renderer', function () {
@@ -25,25 +23,19 @@ $app->get('/', function ($request, $response) {
 
 // BEGIN (write your solution here)
 $app->get('/users', function ($request, $response) use ($users) {
-    $params = [
-        'users' => $users
-    ];
-
-    return $this->get('renderer')->render($response, 'users/index.phtml', $params);
-});
-
-$app->get('/my-users', function ($request, $response) use ($myUsers) {
     $term = $request->getQueryParam('term');
+
     $searchAnswer = [];
-    foreach ($myUsers as $user) {
+    foreach ($users as $user) {
         if (!empty($term)) {
-            if (strpos(mb_strtolower($user), mb_strtolower($term)) !== false) {
+            if (strpos(mb_strtolower($user['firstName']), mb_strtolower($term)) !== false) {
                 $searchAnswer [] = $user;
             }
         }
     }
+
     if (empty($searchAnswer)) {
-        $searchAnswer = $myUsers;
+        $searchAnswer = $users;
     }
 
     $params = [
@@ -52,20 +44,8 @@ $app->get('/my-users', function ($request, $response) use ($myUsers) {
         'searchAnswer' => $searchAnswer
     ];
 
-    return $this->get('renderer')->render($response, 'users/my_users.phtml', $params);
+    return $this->get('renderer')->render($response, 'users/index.phtml', $params);
 });
-
-$app->get('/users/{id}', function ($request, $response, $args) use ($users) {
-    $id = $args['id'];
-    if ($id > 0) {
-        $id--;
-    }
-
-    $user = $users[$id];
-    $params = ['user' => $user];
-
-    return $this->get('renderer')->render($response, 'users/show.phtml', $params);
-});
+// END
 
 $app->run();
-// END

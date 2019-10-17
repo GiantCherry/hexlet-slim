@@ -12,6 +12,7 @@
         "guzzlehttp/guzzle": "*",
         "tightenco/collect": "*",
         "slim/php-view": "*",
+        "danielstjules/stringy": "*",
         "fzaninotto/faker": "*"
     },
     "config": {
