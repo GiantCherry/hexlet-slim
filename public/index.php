@@ -26,8 +26,8 @@ $app->get('/users', function ($request, $response) use ($users) {
     $term = $request->getQueryParam('term');
 
     $searchAnswer = [];
-    foreach ($users as $user) {
-        if (!empty($term)) {
+    if (!empty($term)) {
+        foreach ($users as $user) {
             if (strpos(mb_strtolower($user['firstName']), mb_strtolower($term)) !== false) {
                 $searchAnswer [] = $user;
             }
