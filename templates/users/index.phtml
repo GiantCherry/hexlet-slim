@@ -8,7 +8,9 @@
 
 <?php foreach ($searchAnswer as $user): ?>
     <div>
-        <?= htmlspecialchars($user['firstName']) ?>
+        <?= htmlspecialchars($user['id']) ?> :
+        <?= htmlspecialchars($user['nickname']) ?> :
+        <?= htmlspecialchars($user['email']) ?>
     </div>
 <?php endforeach ?>
 <!-- END -->

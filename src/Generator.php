@@ -15,8 +15,7 @@ class Generator
         for ($i = 0; $i < $count; $i++) {
             $users[] = [
                 'id' => $numbers[$i],
-                'firstName' => $faker->firstName,
-                'lastName' => $faker->lastName,
+                'nickname' => $faker->userName,
                 'email' => $faker->email
             ];
         }
