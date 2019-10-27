@@ -11,43 +11,58 @@ class Test extends TestCase
     public function setUp()
     {
         $this->client = new \GuzzleHttp\Client([
-            'base_uri' => 'http://localhost:8080'
+            'base_uri' => 'http://localhost:8080',
+            'http_errors' => false,
         ]);
     }
 
-    public function testForm()
+    public function testCourses()
     {
-        $response = $this->client->get('/users');
+        $this->client->get('/courses');
+        $response = $this->client->get('/courses/new');
         $body = $response->getBody()->getContents();
-        $this->assertContains('form', $body);
-    }
+        $this->assertContains('course[title]', $body);
+        $this->assertContains('course[paid]', $body);
 
-    public function testUsers()
-    {
-        $response = $this->client->get('/users');
+        $formParams = ['course' => ['title' => '', 'paid' => '']];
+        $response = $this->client->post('/courses', [
+            /* 'debug' => true, */
+            'form_params' => $formParams
+        ]);
         $body = $response->getBody()->getContents();
+        $this->assertEquals(422, $response->getStatusCode());
+        $this->assertContains("Can't be blank", $body);
 
-        $this->assertContains('Wanda', $body);
-        $this->assertContains('Abagail', $body);
-    }
-
-    public function testUsersWithTerm()
-    {
-        $response = $this->client->get('/users?term=alex');
+        $formParams = ['course' => ['title' => 'course name', 'paid' => '']];
+        $response = $this->client->post('/courses', [
+            /* 'debug' => true, */
+            'form_params' => $formParams
+        ]);
         $body = $response->getBody()->getContents();
+        $this->assertContains("Can't be blank", $body);
+        $this->assertContains('course name', $body);
 
-        $this->assertContains('Alexandra', $body);
-        $this->assertContains('Alexie', $body);
-        $this->assertNotContains('Albertha', $body);
-        $this->assertNotContains('Betsy', $body);
-        $this->assertNotContains('Tiana', $body);
-    }
-
-    public function testNotFoundTerm()
-    {
-        $response = $this->client->get('/users?term=bbbbbb');
+        $formParams = ['course' => ['title' => '', 'paid' => '1']];
+        $response = $this->client->post('/courses', [
+            /* 'debug' => true, */
+            'form_params' => $formParams
+        ]);
         $body = $response->getBody()->getContents();
+        $this->assertContains("Can't be blank", $body);
 
-        $this->assertContains('bbbbbb', $body);
+        $formParams = ['course' => ['title' => '<script></script>', 'paid' => '']];
+        $response = $this->client->post('/courses', [
+            /* 'debug' => true, */
+            'form_params' => $formParams
+        ]);
+        $body = $response->getBody()->getContents();
+        $this->assertContains("&lt;script&gt;&lt;/script&gt;", $body);
+
+        $formParams = ['course' => ['title' => '<script></script>', 'paid' => '1']];
+        $response = $this->client->post('/courses', [
+            'allow_redirects' => false,
+            'form_params' => $formParams
+        ]);
+        $this->assertEquals($response->getStatusCode(), 302);
     }
 }

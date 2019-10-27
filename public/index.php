@@ -1,12 +1,12 @@
 <?php
 
-use function Stringy\create as s;
+use App\Validator;
 use Slim\Factory\AppFactory;
 use DI\Container;
 
 require __DIR__ . '/../vendor/autoload.php';
 
-$users = App\Generator::generate(100);
+$repo = new App\Repository();
 
 $container = new Container();
 $container->set('renderer', function () {
@@ -21,66 +21,41 @@ $app->get('/', function ($request, $response) {
     return $this->get('renderer')->render($response, 'index.phtml');
 });
 
-// BEGIN (write your solution here)
-
-$app->get('/users/new', function ($request, $response) {
+$app->get('/courses', function ($request, $response) use ($repo) {
     $params = [
-        'user' => [],
+        'courses' => $repo->all()
+    ];
+    return $this->get('renderer')->render($response, 'courses/index.phtml', $params);
+});
+
+// BEGIN (write your solution here)
+$app->get('/courses/new', function ($request, $response) use ($repo) {
+    $params = [
+        'course' => [],
         'errors' => []
     ];
-    return $this->get('renderer')->render($response, "users/new.phtml", $params);
+
+    return $this->get('renderer')->render($response, 'courses/new.phtml', $params);
 });
 
-$app->get('/users', function ($request, $response) use ($users) {
-    $term = $request->getQueryParam('term');
-    $searchAnswer = [];
-    if (!empty($term)) {
-        foreach ($users as $user) {
-            if (strpos(mb_strtolower($user['nickname']), mb_strtolower($term)) !== false) {
-                $searchAnswer [] = $user;
-            }
-        }
+$app->post('/courses', function ($request, $response) use ($repo) {
+    $course = $request->getParsedBodyParam('course');
+
+    $validator = new Validator();
+    $errors = $validator->validate($course);
+
+    if (count($errors) === 0) {
+        $repo->save($course);
+        return $response->withHeader('Location', '/courses')
+            ->withStatus(302);
     }
-    if (empty($searchAnswer)) {
-        $searchAnswer = $users;
-    }
+
     $params = [
-        'term' => $term,
-        //'users' => $users,
-        'searchAnswer' => $searchAnswer
-    ];
-    return $this->get('renderer')->render($response, 'users/index.phtml', $params);
-});
-
-$app->post('/users', function ($request, $response) {
-     function validate($user) {
-        $errors = [];
-        if (empty($user['name'])) {
-            $errors['name'] = "Can't be blank";
-        }
-
-     return $errors;
-    }
-
-    $user = $request->getParsedBodyParam('user');
-    $errors = validate($user);
-    //$errors = $validator->validate($user);
-//    if (count($errors) === 0) {
-//        $repo->save($user);
-//        return $response->withHeader('Location', '/')
-//            ->withStatus(302);
-//    }
-    $params = [
-        'user' => $user,
+        'course' => $course,
         'errors' => $errors
     ];
 
-    //TODO $user -> json -> file
-    $handle = fopen('users.txt', 'a+');
-    fwrite($handle, json_encode($user));
-    fclose($handle);
-
-    return $this->get('renderer')->render($response, "users/new.phtml", $params);
+    return $this->get('renderer')->render($response->withStatus(422), 'courses/new.phtml', $params);
 });
 // END
 
