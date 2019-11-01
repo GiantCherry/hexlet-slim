@@ -59,7 +59,7 @@ $app->post('/courses', function ($request, $response) use ($repo, $router) {
             ->withStatus(302);
     }
 
-    $router->urlFor('courses');
+    $router->urlFor('/courses');
 
     $params = [
         'course' => $course,
