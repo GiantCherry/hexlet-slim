@@ -17,28 +17,36 @@ AppFactory::setContainer($container);
 $app = AppFactory::create();
 $app->addErrorMiddleware(true, true, true);
 
-$app->get('/', function ($request, $response) {
+$router = $app->getRouteCollector()->getRouteParser();
+
+$app->get('/', function ($request, $response) use ($router) {
     return $this->get('renderer')->render($response, 'index.phtml');
 });
 
-$app->get('/courses', function ($request, $response) use ($repo) {
+$app->get('/courses', function ($request, $response) use ($repo, $router) {
+    //$router->urlFor('/courses');
+
     $params = [
-        'courses' => $repo->all()
+        'courses' => $repo->all(),
+        'route' => $router
     ];
     return $this->get('renderer')->render($response, 'courses/index.phtml', $params);
 });
 
 // BEGIN (write your solution here)
-$app->get('/courses/new', function ($request, $response) use ($repo) {
+$app->get('/courses/new', function ($request, $response) use ($repo, $router) {
+    //$router->urlFor('/courses/new');
+
     $params = [
         'course' => [],
-        'errors' => []
+        'errors' => [],
+        'route' => $router
     ];
 
     return $this->get('renderer')->render($response, 'courses/new.phtml', $params);
 });
 
-$app->post('/courses', function ($request, $response) use ($repo) {
+$app->post('/courses', function ($request, $response) use ($repo, $router) {
     $course = $request->getParsedBodyParam('course');
 
     $validator = new Validator();
@@ -50,9 +58,12 @@ $app->post('/courses', function ($request, $response) use ($repo) {
             ->withStatus(302);
     }
 
+    //$router->urlFor('courses');
+
     $params = [
         'course' => $course,
-        'errors' => $errors
+        'errors' => $errors,
+        'route' => $router
     ];
 
     return $this->get('renderer')->render($response->withStatus(422), 'courses/new.phtml', $params);
