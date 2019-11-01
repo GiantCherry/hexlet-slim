@@ -20,22 +20,23 @@ $app->addErrorMiddleware(true, true, true);
 $router = $app->getRouteCollector()->getRouteParser();
 
 $app->get('/', function ($request, $response) use ($router) {
+    $router->urlFor('/');
     return $this->get('renderer')->render($response, 'index.phtml');
-});
+})->setName('/');
 
 $app->get('/courses', function ($request, $response) use ($repo, $router) {
-    //$router->urlFor('/courses');
+    $router->urlFor('/courses');
 
     $params = [
         'courses' => $repo->all(),
         'route' => $router
     ];
     return $this->get('renderer')->render($response, 'courses/index.phtml', $params);
-});
+})->setName('/courses');
 
 // BEGIN (write your solution here)
 $app->get('/courses/new', function ($request, $response) use ($repo, $router) {
-    //$router->urlFor('/courses/new');
+    $router->urlFor('/courses/new');
 
     $params = [
         'course' => [],
@@ -44,7 +45,7 @@ $app->get('/courses/new', function ($request, $response) use ($repo, $router) {
     ];
 
     return $this->get('renderer')->render($response, 'courses/new.phtml', $params);
-});
+})->setName('/courses/new');
 
 $app->post('/courses', function ($request, $response) use ($repo, $router) {
     $course = $request->getParsedBodyParam('course');
@@ -58,7 +59,7 @@ $app->post('/courses', function ($request, $response) use ($repo, $router) {
             ->withStatus(302);
     }
 
-    //$router->urlFor('courses');
+    $router->urlFor('courses');
 
     $params = [
         'course' => $course,
@@ -67,7 +68,7 @@ $app->post('/courses', function ($request, $response) use ($repo, $router) {
     ];
 
     return $this->get('renderer')->render($response->withStatus(422), 'courses/new.phtml', $params);
-});
+})->setName('/courses');
 // END
 
 $app->run();
